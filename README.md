@@ -11,7 +11,7 @@ I would rather die than register
 
 ---
 
-** 支持网站**
+**支持网站**
 
 **bilibili.com**
 
