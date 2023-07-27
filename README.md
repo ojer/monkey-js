@@ -21,7 +21,6 @@ I would rather die than register
 **csdn.net**
 
 - [x] 复制文章内容
-- [ ] 阻止登录失效重定向
 
 **zhihu.com**
 
