@@ -10,7 +10,7 @@
 // @grant       GM_registerMenuCommand
 // @grant       GM_unregisterMenuCommand
 // @grant       GM_addValueChangeListener
-// @require https://cdn.jsdelivr.net/npm/@violentmonkey/shortcut@1
+// @require     https://unpkg.com/@violentmonkey/shortcut@1.4.1/dist/index.js
 // ==/UserScript==
 
 const { register } = VM.shortcut
