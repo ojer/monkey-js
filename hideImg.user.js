@@ -2,10 +2,9 @@
 // @name        HideImg
 // @namespace   ojer
 // @match       *://*/*
-// @version     1.1
+// @version     1.2
 // @author      ojer
 // @description 隐藏图片
-// @description 1.1 隐藏背景图片
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -18,37 +17,26 @@
 const { register } = VM.shortcut
 
 const HI_STATUS = 'HI_STATUS'
-const HI_STYLE_ID = 'HI_STYLE_ID'
 
 const captionHideKey = 'HideImg (Ctrl+Shift+I)'
 const captionShowKey = 'ShowImg (Ctrl+Shift+I)'
-const styleHide = 'visibility: hidden !important;'
-const styleBkImgHIde = '* {background-image: url("data:,") !important; }'
+const styleBkImgHIde = `
+* { background-image: url("data:,") !important; }
+img,video{ visibility: hidden !important; }
+`
 
 const hide = () => {
   regMenu(true)
-  GM_addStyle(styleBkImgHIde).then((el) => {
-    GM_setValue(HI_STYLE_ID, el.getAttribute('id'))
-  })
-  document.querySelectorAll('img,video').forEach((item) => {
-    item.style = item.getAttribute('style') + ';' + styleHide
-  })
+  GM_addStyle(styleBkImgHIde)
 }
 
 const show = () => {
   regMenu(false)
-  try {
-    document.getElementById(GM_getValue(HI_STYLE_ID)).remove()
-  } catch (ignore) {}
-  document.querySelectorAll('img,video').forEach((item) => {
-    const style = item.getAttribute('style')
-    if (style) {
-      item.style = style.replaceAll(styleHide, '')
-    }
-  })
+  Array.from(document.querySelectorAll('style'))
+    .filter((e) => e.id.startsWith('VMst0.'))
+    .forEach((e) => e.remove())
 }
 
-// const listenerId =
 GM_addValueChangeListener(HI_STATUS, (name, oldValue, newValue, remote) => {
   if (oldValue && !newValue) {
     show()
@@ -69,7 +57,7 @@ register('c-s-i', () => {
 
 const main = () => {
   if (GM_getValue(HI_STATUS, undefined) === undefined) {
-    GM_setValue(HI_STATUS, true)
+    GM_setValue(HI_STATUS, false)
   }
   if (GM_getValue(HI_STATUS)) {
     hide()
