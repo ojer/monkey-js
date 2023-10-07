@@ -37,23 +37,12 @@ const show = () => {
     .forEach((e) => e.remove())
 }
 
-GM_addValueChangeListener(HI_STATUS, (name, oldValue, newValue, remote) => {
-  if (oldValue && !newValue) {
-    show()
-  } else if (!oldValue && newValue) {
-    hide()
-  }
-})
 const regMenu = (isShow) => {
   GM_unregisterMenuCommand(isShow ? captionHideKey : captionShowKey)
   GM_registerMenuCommand(isShow ? captionShowKey : captionHideKey, () => {
     GM_setValue(HI_STATUS, !isShow)
   })
 }
-
-register('c-s-i', () => {
-  GM_setValue(HI_STATUS, !GM_getValue(HI_STATUS))
-})
 
 const main = () => {
   if (GM_getValue(HI_STATUS, undefined) === undefined) {
@@ -65,4 +54,17 @@ const main = () => {
     show()
   }
 }
+
+GM_addValueChangeListener(HI_STATUS, (name, oldValue, newValue, remote) => {
+  if (oldValue && !newValue) {
+    show()
+  } else if (!oldValue && newValue) {
+    hide()
+  }
+})
+
+register('c-s-i', () => {
+  GM_setValue(HI_STATUS, !GM_getValue(HI_STATUS))
+})
+
 main()
