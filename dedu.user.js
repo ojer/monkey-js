@@ -1,4 +1,5 @@
 // ==UserScript==
+// @license     MIT
 // @name        dedu
 // @namespace   ojer
 // @match       https://www.baidu.com/s
