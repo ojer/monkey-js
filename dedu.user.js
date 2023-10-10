@@ -3,16 +3,16 @@
 // @name        dedu
 // @namespace   ojer
 // @match       https://www.baidu.com/s
-// @grant       GM_addStyle
+// @grant       GM_addElement
 // @runat       document-end
-// @version     1.0
+// @version     1.1
 // @author      ojer
 // @description 去除百度搜索结果重定向,去除热榜,去除部分百度系推广
 // ==/UserScript==
-
+//
+const dataId = 'vm-ojer-dedu'
 const addStyle = () => {
-  GM_addStyle(
-    `
+  const content = `
   /* 热点 */
   #content_right{
     display: none !important;
@@ -40,24 +40,32 @@ const addStyle = () => {
     display: none !important;
   }
   `
-  )
+  const ele = GM_addElement(document.head, 'style', content)
+  ele.setAttribute('data-id', dataId)
 }
 
-setTimeout(() => {
-  addStyle()
-  const left = document.getElementById('content_left')
-  if (left) {
-    const childrenElements = left.children
-    for (var i = 0; i < childrenElements.length; i++) {
-      const fc = childrenElements[i]
-      try {
-        const href = fc.getAttribute('mu')
-        const h3 = fc.querySelector('h3')
-        const a = h3.querySelector('a')
-        a.setAttribute('href', href)
-      } catch (e) {}
+const main = (s) => {
+  setTimeout(addStyle())
+  setTimeout(() => {
+    const left = document.getElementById('content_left')
+    if (left) {
+      const childrenElements = left.children
+      for (var i = 0; i < childrenElements.length; i++) {
+        const fc = childrenElements[i]
+        try {
+          const href = fc.getAttribute('mu')
+          const h3 = fc.querySelector('h3')
+          const a = h3.querySelector('a')(a && href && a.setAttribute('href', href))
+        } catch (ignore) {}
+      }
     }
-  }
-}, 1500)
+  }, s)
+}
 
-addStyle()
+new MutationObserver((mutationsList, observer) => {
+  if (!document.querySelector('style[data-id="' + dataId + '"]')) {
+    main(800)
+  }
+}).observe(document.body, {
+  childList: true
+})
