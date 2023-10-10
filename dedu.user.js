@@ -5,7 +5,7 @@
 // @match       https://www.baidu.com/s
 // @grant       GM_addElement
 // @runat       document-end
-// @version     1.1
+// @version     1.3
 // @author      ojer
 // @description 去除百度搜索结果重定向,去除热榜,去除部分百度系推广
 // ==/UserScript==
@@ -54,8 +54,9 @@ const main = (s) => {
         const fc = childrenElements[i]
         try {
           const href = fc.getAttribute('mu')
-          const h3 = fc.querySelector('h3')
-          const a = h3.querySelector('a')(a && href && a.setAttribute('href', href))
+          if (href) {
+            fc.querySelectorAll('a').forEach((a) => a.setAttribute('href', href))
+          }
         } catch (ignore) {}
       }
     }
