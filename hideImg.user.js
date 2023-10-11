@@ -2,7 +2,7 @@
 // @name        HideImg
 // @namespace   ojer
 // @match       *://*/*
-// @version     1.3
+// @version     1.4
 // @author      ojer
 // @description 隐藏图片
 // @grant       GM_getValue
@@ -17,6 +17,7 @@
 let hImg = undefined
 const { register } = VM.shortcut
 const HI_STATUS = 'HI_STATUS'
+const dataId = 'vm-hide-img'
 
 const captionKey = 'Hide/Show Img(Ctrl+Shift+I)'
 
@@ -44,13 +45,11 @@ class StateOn {
   constructor(hImg) {
     this.hImg = hImg
   }
+
   switchMode() {
-    const content = `
-* { background-image: url("data:,") !important; }
-img,video{ visibility: hidden !important; }
-`
+    const content = `* { background-image: url("data:,") !important; } img,video{ visibility: hidden !important; }`
     const ele = GM_addElement(document.head, 'style', content)
-    ele.setAttribute('data-id', 'vm-hide-img')
+    ele.setAttribute('data-id', dataId)
   }
 }
 
@@ -59,8 +58,9 @@ class StateOff {
   constructor(hImg) {
     this.hImg = hImg
   }
+
   switchMode() {
-    document.querySelectorAll("style[data-id='vm-hide-img']").forEach((e) => e.remove())
+    document.querySelectorAll('style[data-id="' + dataId + '"]').forEach((e) => e.remove())
   }
 }
 
@@ -81,3 +81,14 @@ register('c-s-i', () => {
 
 hImg = new Himg(GM_getValue(HI_STATUS, undefined))
 hImg.switchMode()
+
+if (0 || window.location.href.includes('www.baidu.com/s?')) {
+  new MutationObserver((mutationsList, observer) => {
+    if (!document.querySelector('style[data-id="' + dataId + '"]')) {
+      console.log('observer check')
+      hImg.switchMode()
+    }
+  }).observe(document.body, {
+    childList: true
+  })
+}
