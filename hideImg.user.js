@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name        HideImg
+// @license     MIT
 // @namespace   ojer
 // @match       *://*/*
-// @version     1.4
+// @version     1.41
 // @author      ojer
 // @description 隐藏图片
 // @grant       GM_getValue
@@ -12,7 +13,6 @@
 // @grant       GM_unregisterMenuCommand
 // @grant       GM_addValueChangeListener
 // @require     https://unpkg.com/@violentmonkey/shortcut@1.4.1/dist/index.js
-// ==/UserScript==
 
 let hImg = undefined
 const { register } = VM.shortcut
@@ -25,6 +25,7 @@ class Himg {
   state
   stateOn
   stateOff
+
   constructor(on) {
     this.stateOn = new StateOn(this)
     this.stateOff = new StateOff(this)
@@ -40,9 +41,38 @@ class Himg {
   }
 }
 
-class StateOn {
+class State {
+  msg(context) {
+    const div = document.createElement('div')
+    div.innerText = context
+    div.setAttribute(
+      'style',
+      `
+      padding: 5px 20px;
+      color: #FFF;
+      background: #303133;
+      border: solid 1px #909399;
+      border-radius: 5px;
+      z-index: 9999999;
+      position: fixed;
+      top: 30px;
+      right: 50%;
+      transform: translateX(50%);
+      `
+    )
+    document.body.prepend(div)
+    setTimeout(() => {
+      try {
+        div.remove()
+      } catch (ignore) {}
+    }, 1500)
+  }
+}
+
+class StateOn extends State {
   hImg
   constructor(hImg) {
+    super()
     this.hImg = hImg
   }
 
@@ -50,17 +80,20 @@ class StateOn {
     const content = `* { background-image: url("data:,") !important; } img,video{ visibility: hidden !important; }`
     const ele = GM_addElement(document.head, 'style', content)
     ele.setAttribute('data-id', dataId)
+    super.msg('Img Hide')
   }
 }
 
-class StateOff {
+class StateOff extends State {
   hImg
   constructor(hImg) {
+    super()
     this.hImg = hImg
   }
 
   switchMode() {
     document.querySelectorAll('style[data-id="' + dataId + '"]').forEach((e) => e.remove())
+    super.msg('Img Show')
   }
 }
 
