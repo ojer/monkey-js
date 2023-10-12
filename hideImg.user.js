@@ -13,6 +13,7 @@
 // @grant       GM_unregisterMenuCommand
 // @grant       GM_addValueChangeListener
 // @require     https://unpkg.com/@violentmonkey/shortcut@1.4.1/dist/index.js
+// ==/UserScript==
 
 let hImg = undefined
 const { register } = VM.shortcut
