@@ -3,7 +3,7 @@
 // @license     MIT
 // @namespace   ojer
 // @match       *://*/*
-// @version     1.41
+// @version     1.42
 // @author      ojer
 // @description 隐藏图片
 // @grant       GM_getValue
@@ -118,7 +118,7 @@ hImg.switchMode()
 
 if (0 || window.location.href.includes('www.baidu.com/s?')) {
   new MutationObserver((mutationsList, observer) => {
-    if (!document.querySelector('style[data-id="' + dataId + '"]')) {
+    if (!document.querySelector('style[data-id="' + dataId + '"]') && GM_getValue(HI_STATUS)) {
       console.log('observer check')
       hImg.switchMode()
     }
