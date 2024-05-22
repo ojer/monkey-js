@@ -6,7 +6,7 @@
 // @match       https://fanyi.baidu.com/*
 // @grant       GM_addElement
 // @runat       document-end
-// @version     1.34
+// @version     1.35
 // @author      ojer
 // @description 去除百度搜索结果重定向,热榜,部分百度系推广, 翻译页广告弹出层
 // ==/UserScript==

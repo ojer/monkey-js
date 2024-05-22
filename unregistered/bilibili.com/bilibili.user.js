@@ -4,16 +4,18 @@
 // @match       https://www.bilibili.com/video/**
 // @run-at      document-end
 // @author      ojer
-// @version     1.06
+// @version     1.07
 // @description  关闭播放 60 秒后的登录框并继续播放
 // @license     MIT
 // @grant       none
 // ==/UserScript==
-
-unsafeWindow.dataScreen = undefined
-unsafeWindow.biliScriptActive = 1
-unsafeWindow.foo = 1
-let nIntervId = 0
+// start
+const config = {
+  dataScreen: 'normal',
+  biliScriptActive: 1,
+  manual:  1,
+  nIntervId: 0
+}
 
 const callback = (mutationsList) => {
   const typeChildList = 'childList'
@@ -36,28 +38,27 @@ const callback = (mutationsList) => {
       if (!addedNode.classList.contains(loginDiaClass)) {
         return
       }
-      unsafeWindow.foo = 0
+      config.manual = 0
       document.querySelector('.bili-mini-close-icon').click()
       setTimeout(() => {
-        switch(unsafeWindow.dataScreen){
+        switch(config.dataScreen){
           case 'full':
-            // document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-full').click()
-            // break
           case 'web':
             document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-web').click()
             break
           case 'wide':
-            document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-wide').click()
+            // document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-wide').click()
             break
           case 'normal':
             break
           default:
         }
-        if (unsafeWindow.biliScriptActive === 1) {
+        // console.debug('play?',  config.biliScriptActive === 1)
+        if (config.biliScriptActive === 1) {
           unsafeWindow.player.play()
-          unsafeWindow.biliScriptActive = 0
+          config.biliScriptActive = 0
         }
-        unsafeWindow.foo = 1
+        config.manual = 1
       }, 500)
       break
     }
@@ -66,23 +67,26 @@ const callback = (mutationsList) => {
 
 const intervalCallback = () => {
   const container = document.querySelector('#bilibili-player .bpx-player-container.bpx-state-paused')
-  const video = document.querySelector('#bilibili-player video')
-  if (!container || !video) {
+  const videoTitle = document.querySelector('.video-title.special-text-indent')
+
+  if (!container || !videoTitle) {
     return
   }
   new MutationObserver((mutationsList) => {
+    // console.debug('reset active', mutationsList)
     mutationsList.forEach((mutations) => {
-      unsafeWindow.biliScriptActive = 1
+      config.biliScriptActive = 1
     })
-  }).observe(video, {
-    attributeFilter: ['src']
+  }).observe(videoTitle, {
+    attributeFilter: ['data-title']
   })
 
   new MutationObserver((mutationsList) => {
+    // console.debug('screen change')
     mutationsList.forEach(({target, oldValue }) => {
       setTimeout(() => {
-        if (unsafeWindow.foo === 1) {
-          unsafeWindow.dataScreen = target.dataset.screen
+        if (config.manual === 1) {
+          config.dataScreen = target.dataset.screen
         }
       },300)
     })
@@ -100,4 +104,4 @@ setTimeout(() => {
     childList: true
   })
 }, 55e3)
-
+// end

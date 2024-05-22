@@ -4,7 +4,7 @@
 // @namespace   github.com/ojer
 // @match       http*://*.zhihu.com/**
 // @grant       GM_addStyle
-// @version     1.3
+// @version     1.4
 // @author      ojer
 // @description 关闭登录弹框 
 // ==/UserScript==
