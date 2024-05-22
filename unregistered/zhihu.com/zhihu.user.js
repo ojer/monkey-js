@@ -9,5 +9,17 @@
 // @description 关闭登录弹框 
 // ==/UserScript==
 
-GM_addStyle(`html{overflow: scroll !important;}`)
-GM_addStyle(`.Modal-wrapper,.Modal-enter-done{display: none !important;}`)
+GM_addStyle(`
+	html{
+		overflow: scroll !important;
+	}
+
+	header.AppHeader {
+		display: none !important;
+	}
+	.Modal-wrapper,.Modal-enter-done{
+		display: none !important;
+	}
+`)
+
+

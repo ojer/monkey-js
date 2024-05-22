@@ -41,9 +41,10 @@ const addStyle = () => {
       display: none !important;
     }
 
-    #root ~ div {
-      display: none !important;
-    }
+    body > div:not(#root) {
+			display: none !important;
+		}
+
     `
   }
 

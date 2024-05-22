@@ -1,59 +1,103 @@
 // ==UserScript==
 // @name        就不登录-bilibili
-// @license MIT
 // @namespace   github.com/ojer
 // @match       https://www.bilibili.com/video/**
-// @grant       none
-// @version     1.06
+// @run-at      document-end
 // @author      ojer
+// @version     1.06
 // @description  关闭播放 60 秒后的登录框并继续播放
+// @license     MIT
+// @grant       none
 // ==/UserScript==
 
-const loginDiaClass = 'bili-mini-mask'
-
-const webFullBtnClass = '.bpx-player-ctrl-btn.bpx-player-ctrl-web'
-
-const observerOptions = {
-	childList: true,
-	subtree: false
-}
-let observer = {}
-const targetNode = document.body
+unsafeWindow.dataScreen = undefined
 unsafeWindow.biliScriptActive = 1
+unsafeWindow.foo = 1
+let nIntervId = 0
+
+const callback = (mutationsList) => {
+  const typeChildList = 'childList'
+  const loginDiaClass = 'bili-mini-mask'
+  mutationsList.forEach(({
+    type,
+    addedNodes
+  }) => {
+    if (type !== typeChildList) {
+      return
+    }
+
+    for (const addedNode of addedNodes) {
+      if (!addedNode instanceof HTMLElement) {
+        return
+      }
+      if (!addedNode.classList) {
+        return
+      }
+      if (!addedNode.classList.contains(loginDiaClass)) {
+        return
+      }
+      unsafeWindow.foo = 0
+      document.querySelector('.bili-mini-close-icon').click()
+      setTimeout(() => {
+        switch(unsafeWindow.dataScreen){
+          case 'full':
+            // document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-full').click()
+            // break
+          case 'web':
+            document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-web').click()
+            break
+          case 'wide':
+            document.querySelector('.bpx-player-ctrl-btn.bpx-player-ctrl-wide').click()
+            break
+          case 'normal':
+            break
+          default:
+        }
+        if (unsafeWindow.biliScriptActive === 1) {
+          unsafeWindow.player.play()
+          unsafeWindow.biliScriptActive = 0
+        }
+        unsafeWindow.foo = 1
+      }, 500)
+      break
+    }
+  })
+}
+
+const intervalCallback = () => {
+  const container = document.querySelector('#bilibili-player .bpx-player-container.bpx-state-paused')
+  const video = document.querySelector('#bilibili-player video')
+  if (!container || !video) {
+    return
+  }
+  new MutationObserver((mutationsList) => {
+    mutationsList.forEach((mutations) => {
+      unsafeWindow.biliScriptActive = 1
+    })
+  }).observe(video, {
+    attributeFilter: ['src']
+  })
+
+  new MutationObserver((mutationsList) => {
+    mutationsList.forEach(({target, oldValue }) => {
+      setTimeout(() => {
+        if (unsafeWindow.foo === 1) {
+          unsafeWindow.dataScreen = target.dataset.screen
+        }
+      },300)
+    })
+  }).observe(container, {
+    attributeFilter: ['data-screen'],
+    attributeOldValue: true
+  })
+  clearInterval(nIntervId)
+}
+
+nIntervId = setInterval(intervalCallback, 500)
 
 setTimeout(() => {
-	const videoHeight = document.querySelector('video').offsetHeight
-	observer = new MutationObserver((mutationsList) => {
-		for (const mutation of mutationsList) {
-			if (mutation.type === 'childList') {
-				for (const addedNode of mutation.addedNodes) {
-					if (addedNode instanceof HTMLElement && addedNode.classList.contains(loginDiaClass)) {
-						document.querySelector('.bili-mini-close-icon').click()
-						setTimeout(() => {
-							const innerHeight = document.querySelector('video').offsetHeight
-							if (innerHeight < videoHeight) {
-								unsafeWindow.biliScriptActive = 1
-								document.querySelector(webFullBtnClass).click()
-							}
-							if (unsafeWindow.biliScriptActive === 1) {
-								// const _timeout = window.setTimeout
-								// window.setTimeout = function(handler, timeout, ...args) {
-								//  return _timeout.call(window, handler, timeout, ...args);
-								// }
-								unsafeWindow.player.play()
-								unsafeWindow.biliScriptActive = 0
-							}
-						}, 500)
-						//  observer.disconnect()
-						break
-					}
-				}
-			}
-		}
-	})
-	observer.observe(targetNode, observerOptions)
+  new MutationObserver(callback).observe(document.body, {
+    childList: true
+  })
 }, 55e3)
 
-unsafeWindow.addEventListener('popstate', () => {
-	unsafeWindow.biliScriptActive = 1
-})
